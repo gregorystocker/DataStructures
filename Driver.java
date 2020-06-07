@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class Driver<Key extends Comparable, Value> {
@@ -10,6 +11,7 @@ public class Driver<Key extends Comparable, Value> {
     private DoublyLinkedList<String> dll = new DoublyLinkedList();
     private SequentialSearchST<String, Integer> sst = new SequentialSearchST();
     private BST<Integer,String> bst = new BST();
+    private BST<Integer,Integer> bst2 = new BST();
     private static Driver main = new Driver();
 
     /**
@@ -96,9 +98,9 @@ public class Driver<Key extends Comparable, Value> {
 
     //runs tests on the different data structures from Sedwick`s Algorithms book
     public static void main(String[] args){
-        /*
-        Driver main = new Driver();
 
+        Driver main = new Driver();
+/*
         main.bst.put(20,"a");
         main.bst.put(8,"b");
         main.bst.put(21,"c");
@@ -141,7 +143,47 @@ public class Driver<Key extends Comparable, Value> {
         //main.bst.deleteMax();
         //main.bst.delete(20);
        // main.bst.print();
-        main.queues();
+       //main.queues();
+        List<LinkedList<Integer>> newList = new LinkedList<LinkedList<Integer>>();
+
+
+
+        BST.Node nn = main.bst2.getNode(32, 55);
+
+        for(int i = 0; i < 4; i++) {
+            newList.add(i, new LinkedList<Integer>());
+            for(int j = 0; j < 5; j ++){
+                newList.get(i).add(j+1);
+            }//ends inner for
+        }//ends outer for
+
+        newList = main.bst2.update(nn, 0, newList);
+
+        List<LinkedList<Integer>> l1 = new LinkedList<LinkedList<Integer>>();
+        main.bst2.put(20, 1);
+        main.bst2.put(10, 2);
+        main.bst2.put(30, 3);
+        main.bst2.put(5, 4);
+        main.bst2.put(15, 5);
+        main.bst2.put(25, 6);
+        main.bst2.put(35, 7);
+        l1 = main.bst2.levelOrder(main.bst2.root);
+
+        //print out the lists
+        System.out.println('[');
+        for(int i = 0; i < l1.size(); i++){
+            System.out.print("\t[");
+            for(int j = 0; j < l1.get(i).size();j++){
+                if(j == l1.get(i).size() - 1)
+                    System.out.print(l1.get(i).get(j) + " ]\n");
+                else
+                    System.out.print(l1.get(i).get(j) + " , ");
+
+            }
+        }//ends print outer loop
+        System.out.println(']');
+
+
 
     }//ends public static void main
 }//ends Driver

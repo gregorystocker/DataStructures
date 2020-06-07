@@ -41,5 +41,100 @@ public class LinearProbingHashST<Key extends Comparable,Value> {
             }
         }
 
+    }//ends hash
+
+    public void delete(Key key) {
+        //check if the hash table contains the key
+        if (!contains(key)) return;
+        //find the array index using our hash function
+        int i = hash(key);
+        //while we`re not at the right key, increase the index, but use the modulo so it will wrap around and never
+        //go out of bounds
+        while (!key.equals(keys[i]))     i = (i + 1) % M;
+
+        //found correct index
+        //delete that value
+            keys[i] = null;
+            vals[i] = null;
+
+            //increment one past the now null key value-pair
+        i = (i + 1)%M;
+
+        //loop through all the pairs after the deleted value until you hit a null
+        while(keys[i] != null)  {
+            //create a temp for the key-value pair
+            Key keyToRedo = keys[i];
+            Value valToRedo = vals[i];
+            //delete the current pair
+            keys[i] = null;
+            vals[i] = null;
+            N--;
+            put(keyToRedo,valToRedo);
+        }//end while loop
+        //decrement N once more once we are out of the loop so that we can account for the value we didnt replace
+        N--;
+        //grows the table to keep the N/M ratio
+        if(N > 0 && N == M/8) resize(M/2);
+    }//ends delete
+
+    /**
+     * returns a boolean value representing whether or not the key is in the HT
+     * @param key
+     * @return
+     */
+    public boolean contains(Key key){
+        //find the index for the array to start at
+        int start = hash(key);
+
+        //loop through the keys until we see a null value using a modulo to wrap around to the beginning
+        for(int i = start; keys[i] != null; i = (i + 1) % M){
+            if(keys[i].equals(key))     return true;
+        }
+        //if the for loop reaches it`s end and we haven`t found the key, it`s not there
+        return  false;
     }
-}
+
+    /**
+     * resizes both the keys and the vals arrays to the given size
+     * @param size tells the function what size to make the arrays
+     */
+    public void resize(int size){
+        //Java does not allow us to create arrays of generics, so we must create arrays of their parents and cast
+        // them to generics
+        Comparable[] tempKeys = (Key[])new Comparable[size];
+        Object[] tempVals = (Object[]) new Object[size];
+
+        //copies the values from keys and vals to the temporary arrays
+        for(int i = 0; i < keys.length; i++){
+            tempKeys[i] = keys[i];
+            tempVals[i] = vals[i];
+        }
+        //assign the originals to the temps
+        keys = (Key[])tempKeys;
+        vals = (Value[])tempVals;
+    }//ends resize
+
+    /**
+     * my version of get() which accounts for and allows a search of a completely full table in contrast to the book which
+     * depends on other functions to handle resizing such that the table is never full.
+     * @param key the key to get
+     * @return the value of the searched key
+     */
+    public Value get(Key key){
+        boolean flag = false;
+        int start = hash(key);
+        for(int i = start; i < M; i = (i+1)%M ){
+            if(keys[i] == key)
+                return vals[i];
+            else if (keys[i] == null)
+                return null;
+            //note this flag is to avoid an infinite loop if we have a full table, but the book actually leaves this
+            //out and resizes the table such that it never becomes full
+            if(i == start && flag)  return null;
+            flag = true;
+        }
+       return null;
+    }
+
+
+}//ends class LinearProbingHashST

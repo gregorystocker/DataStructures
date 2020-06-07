@@ -1,9 +1,10 @@
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class BST<Key extends Comparable, Value> {
     //Class member variables
-private Node root;
+public Node root;
 
 
     /**
@@ -314,12 +315,84 @@ public void put(Key key, Value val){
         }
     }//ends merge
 
+    /**
+     * gives a list representation of the level order of the tree:
+     *     For example:
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     *   is output as:
+     * [
+     *   [3],
+     *   [9,20],
+     *   [15,7]
+     * ]
+     * The trick is that I actually do an in-order traversal, but I keep track of which level I am on recursively so
+     * I can return back to previous levels and add to the correct list index there.
+     * @param root the entry point to the tree
+     * @return returns a List<List<Value>> where each inner list holds the values of the nodes on that level.
+     */
+    public List<List<Value>> levelOrder(Node root) {
+        //the list we will return
+        List<List<Value>> list = new LinkedList<List<Value>>();
+        //pass to the recursive helper function that does all the work with the starting point of level 0.
+        list = loHelper(root, 0, list);
+        //after the recursive calls are finished list is updated to the correct thing.
+            return list;
+    }//ends the levelOrder method
+
+    /**
+     * recursive helper function that does the heavy recursive lifting for levelOrder
+     * @param x current Node
+     * @param lvl current level
+     * @param list the list representation of the tree
+     * @return a list of lists which store the values in the nodes: level |-> inner list
+     */
+    public List<List<Value>>  loHelper(Node x, int lvl,List<List<Value>> list){
+        //base case, at the end of a branch, return the list as it is
+        if (x == null) return list;
+        //resize the list if there is no list created at that point
+        if(lvl >= list.size())   list.add(new LinkedList<Value>());
+        //adds the node`s value to the correct sub list matching it`s level
+        list = update(x,lvl, list);
+        //calls it`self recursively on it`s left and right children, getting updated along the way
+        list = loHelper(x.left,lvl+1,list);
+        list = loHelper(x.right,lvl+1,list);
+
+        return list;
+    }
+
+    /**
+     * for testing purposes only
+     * @param key key
+     * @param val value
+     * @return node(key,val,0)
+     */
+    public Node getNode(Key key, Value val){
+        Node nn = new Node(key, val,  0);
+        return nn;
+    }
+
+    /**
+     * updates list representation with a new node`s value
+     * @param x Node to pull value from
+     * @param lvl level of x
+     * @return the updated list
+     */
+    public List<List<Value>> update(Node x, int lvl, List<List<Value>> list){
+       List<Value> copy =list.get(lvl);
+        copy.add(x.val);
+        list.set(lvl,copy);
+        return list;
+    }//ends update
 
     public class Node{
         private Node left;
         private Node right;
         private Key key;
-        private Value val;
+       public Value val;
         private int N;
 
         public Node(Key key, Value val, int N){
@@ -336,5 +409,6 @@ public void put(Key key, Value val){
             this.right = right;
         }
     }
+
 
 }
